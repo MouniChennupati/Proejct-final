@@ -8,9 +8,9 @@ function LoginForm(){
 
     const {user, updateUser} = useContext(UserContext);
 
-    const {username, email, password} = user;
+    const {username,userid, email, password} = user;
 
-    const onChange = (e) => updateUser({...user, [e.target.name]: e.target.value})
+    const onChange = (e) => updateUser(e.target.name, e.target.value)
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -19,7 +19,9 @@ function LoginForm(){
         .then((data) => {
             if(!data.message){
                 console.log(data);
+                updateUser("userid",data._id);
                 updateUser("authenticated",true);
+                
                 navigate("/profile");
             }
             

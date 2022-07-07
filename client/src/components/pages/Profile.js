@@ -1,11 +1,16 @@
 import UserContext from "../../context/user/userContext.js";
 import { fetchData } from "../../main.js";
-import {useContext, Fragment} from 'react';
-import { useState } from "react";
+import { useContext, Fragment } from 'react';
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { Link, Outlet } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 function About() {
-    const {user, updateUser} = useContext(UserContext);
+    const navigate = useNavigate();
+
+    const { user, updateUser } = useContext(UserContext);
 
     const authenticated = (
         <Fragment>
@@ -13,14 +18,63 @@ function About() {
         </Fragment>
     );
 
-    const guest = (
-        <Fragment>
-            <h2></h2>
-        </Fragment>
-    );
+
+    const [postData, setPost] = useState({
+        userid: user.username,
+        post: "",
+        posttype: ""
+    });
+
+    const [postedData, setPostedData] = useState([]);
+
+    const { userid, post, posttype } = postData;
+
+    const onInputChange = e => {
+        setPost({ ...postData, [e.target.name]: e.target.value });
+    }
+
+    useEffect(() => {
+        loadPosts();
+    }, []);
+
+    const loadPosts = async () => {
+
+        const posts = await axios.post("/post/getUserPosts", {
+
+            userid: user.username
+        });
+        console.log(posts.data);
+        setPostedData(posts.data);
+
+    };
+
+    const onSubmit = async e => {
+        e.preventDefault();
+        console.log(postData);
+        await axios.post("/post/create", postData);
+        setPost({
+            userid: user.username,
+            post: "",
+            posttype: ""
+        });
+        loadPosts();
+
+    }
+
+    const deletePost = async postid => {
+        var post_id = postid;
+        await axios.delete("/post/delete", {
+            data: {
+                postid: post_id
+            }
+        });
+        loadPosts();
+
+    };
+
+
 
     return (
-
         <div className="container my-5 mx-5">
             <div className="card px-5 py-5">
                 <div className="row">
@@ -35,22 +89,45 @@ function About() {
                     </div>
                     <div className="col-sm-7 card px-4 py-4">
                         <h4 className="mb-4">Add a post</h4>
-                        <form action="">
-                            <textarea name="" id="" rows="3" className="form-control"></textarea>
+                        <form onSubmit={e => onSubmit(e)}>
+                            <label htmlFor="">Post</label>
+                            <textarea id="" rows="3" className="form-control" name="post" value={post} onChange={e => onInputChange(e)} required></textarea>
+                            <label htmlFor="" className="my-3">Post Type</label>
+                            <input type="text" className="form-control" name="posttype" value={posttype} onChange={e => onInputChange(e)} required />
+
                             <div className="d-flex justify-content-end">
                                 <button className="btn btn-sm btn-success my-3"><strong>Post this content</strong></button>
                             </div>
                         </form>
                         <h4 className="mt-5 mb-3">All Your Posts</h4>
                         <div className="card px-4 py-4">
-                            <h6>Hello Guys! I am very excited to announce this! I got placed in Fortune-500</h6>
-                            <h6>2k <i className="fa fa-thumbs-up text-primary"></i></h6>
+                            {
+                                Object.values(postedData).map((posted, index) => (
+                                    <div className="card px-2 py-2">
+                                        <div className="row">
+
+                                            <div className="col d-flex justify-content-end"><button className="btn btn-sm btn-danger" disabled>{posted.posttype}</button></div>
+                                            <div className="col-xs-2 col-1  d-flex justify-content-end">
+                                                <Link
+
+                                                    onClick={() => deletePost(posted._id)} to=""
+                                                >
+                                                    <i className="fa fa-trash text-danger fa-2x"></i>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        <h6>{posted.post}</h6>
+
+                                    </div>
+
+                                ))
+                            }
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     );
 }
 
