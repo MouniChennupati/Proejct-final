@@ -4,8 +4,8 @@ const mongoose = require("mongoose");
 // 2. create schema for entity
 const postSchema = new mongoose.Schema({
   post: {type:String, required:true},
-  posttype: { type: String, required: true},
-  userid: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  posttype: { type: String,},
+  userid: { type: String },
   comment: [{
     commentdate: {type: Date, default: Date.now},
     userid: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
@@ -34,7 +34,9 @@ async function updatePost(postid, post, posttype) {
 
 
 async function deletePost(postid) {
+  console.log("This is Im going to delete", postid);
   await Post.deleteOne({"_id": postid});
+  console.log("This is I have deleted", postid);
 };
 
 

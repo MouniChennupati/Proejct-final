@@ -39,7 +39,7 @@ function About() {
 
     const loadPosts = async () => {
 
-        const posts = await axios.post("/post/getUserPosts", {
+        const posts = await axios.post("https://my-social-proj.herokuapp.com/post/getUserPosts", {
 
             userid: user.username
         });
@@ -51,7 +51,7 @@ function About() {
     const onSubmit = async e => {
         e.preventDefault();
         console.log(postData);
-        await axios.post("/post/create", postData);
+        await axios.post("https://my-social-proj.herokuapp.com/post/create", postData);
         setPost({
             userid: user.username,
             post: "",
@@ -63,7 +63,7 @@ function About() {
 
     const deletePost = async postid => {
         var post_id = postid;
-        await axios.delete("/post/delete", {
+        await axios.delete("https://my-social-proj.herokuapp.com/post/delete", {
             data: {
                 postid: post_id
             }

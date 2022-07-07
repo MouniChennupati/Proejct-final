@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const mongoose = require("mongoose");
 const path = require('path');
-
+const cors = require('cors')
 const userRoutes = require('./server/routes/user');
 const postRoutes = require('./server/routes/post');
 
@@ -11,7 +11,7 @@ const postRoutes = require('./server/routes/post');
 mongoose.connect(process.env.dbURL)
  .then(console.log("DB Connected!!"))
  .catch(error => console.log(error));
-
+ app.use(cors())
 app.use(express.json()); 
 
 app.use(express.static(__dirname + "/client/build"));
